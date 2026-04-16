@@ -11,7 +11,7 @@ export type PortfolioProject = {
 	name: string;
 	year: string;
 	company: string;
-	description: string;
+	description: Record<string, string>;
 	technologyTags: string[];
 	link: {
 		label: string;
@@ -31,7 +31,7 @@ type RawPortfolioProject = {
 	name: string;
 	year: string;
 	company: string;
-	description: string;
+	description: Record<string, string>;
 	"technology-tags": string[];
 	link: {
 		label: string;

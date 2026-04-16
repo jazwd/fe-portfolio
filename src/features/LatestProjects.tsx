@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { PortfolioProject } from '@/lib/portfolioApi'
 import ImageGalleryModal from '@/components/ImageGalleryModal'
 
@@ -12,13 +13,14 @@ type ProjectImageSliderProps = {
 }
 
 const ProjectImageSlider = ({ projectName, images }: ProjectImageSliderProps) => {
+  const { t } = useTranslation('home')
   const [index, setIndex] = useState(0)
   const [isGalleryOpen, setIsGalleryOpen] = useState(false)
 
   if (images.length === 0) {
     return (
       <div className="flex h-52 items-center justify-center rounded-xl border border-slate-200 bg-slate-100 text-slate-500">
-        No images available
+        {t('noImagesAvailable')}
       </div>
     )
   }
@@ -62,7 +64,7 @@ const ProjectImageSlider = ({ projectName, images }: ProjectImageSliderProps) =>
             onClick={handlePrev}
             className="rounded-md border border-slate-300 px-3 py-1 text-sm text-slate-700 transition hover:bg-slate-100"
           >
-            Prev
+            {t('prev')}
           </button>
 
           <p className="text-xs text-slate-500">
@@ -74,7 +76,7 @@ const ProjectImageSlider = ({ projectName, images }: ProjectImageSliderProps) =>
             onClick={handleNext}
             className="rounded-md border border-slate-300 px-3 py-1 text-sm text-slate-700 transition hover:bg-slate-100"
           >
-            Next
+            {t('next')}
           </button>
         </div>
       )}
@@ -92,6 +94,7 @@ const ProjectImageSlider = ({ projectName, images }: ProjectImageSliderProps) =>
 }
 
 const LatestProjects = ({ projects }: LatestProjectsProps) => {
+  const { t, i18n } = useTranslation('home')
   const renderProjectLnkButton = (project: PortfolioProject) => {
     return (
       <a
@@ -107,7 +110,7 @@ const LatestProjects = ({ projects }: LatestProjectsProps) => {
 
   return (
     <section className="mx-auto w-full max-w-6xl px-6 md:px-10">
-      <h2 className="text-2xl font-semibold text-slate-900 md:text-3xl">Latest Projects</h2>
+      <h2 className="text-2xl font-semibold text-slate-900 md:text-3xl">{t('latestProjects')}</h2>
 
       <div className="mt-6 grid grid-cols-1 gap-8 md:grid-cols-2">
         {projects.map((project) => (
@@ -120,7 +123,7 @@ const LatestProjects = ({ projects }: LatestProjectsProps) => {
               {project.company} • {project.year}
             </p>
 
-            <p className="text-slate-700">{project.description}</p>
+            <p className="text-slate-700">{project.description[i18n.language] ?? project.description.en}</p>
 
             <div className="flex flex-wrap gap-2">
               {project.technologyTags.map((tech) => (

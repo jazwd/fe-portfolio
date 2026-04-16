@@ -1,0 +1,13 @@
+{
+	"headerTitle": "PORTAFOLIO",
+	"visitLinkedIn": "Visita mi LinkedIn",
+	"latestProjects": "Últimos proyectos",
+	"noImagesAvailable": "No imágenes disponibles",
+	"prev": "Ant",
+	"next": "Sig",
+	"closeGallery": "Cerrar galería",
+	"previousImage": "Imagen anterior",
+	"nextImage": "Siguiente imagen",
+	"loadingPortfolio": "Cargando datos del portafolio...",
+	"unexpectedError": "Error inesperado"
+}

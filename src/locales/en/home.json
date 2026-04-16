@@ -1,0 +1,13 @@
+{
+	"headerTitle": "PORTFOLIO",
+	"visitLinkedIn": "Visit LinkedIn",
+	"latestProjects": "Latest Projects",
+	"noImagesAvailable": "No images available",
+	"prev": "Prev",
+	"next": "Next",
+	"closeGallery": "Close gallery",
+	"previousImage": "Previous image",
+	"nextImage": "Next image",
+	"loadingPortfolio": "Loading portfolio data...",
+	"unexpectedError": "Unexpected error"
+}

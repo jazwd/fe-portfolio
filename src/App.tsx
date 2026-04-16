@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import Loading from '@/components/Loading'
 import Header from '@/features/Header'
 import LatestProjects from '@/features/LatestProjects'
 import { fetchPortfolioInformation } from '@/lib/portfolioApi'
 
 const App = () => {
+  const { t } = useTranslation('home')
   const {
     data: portfolioData,
     error,
@@ -18,12 +20,12 @@ const App = () => {
     <main className="flex min-h-screen w-full flex-col gap-4 pb-10">
       <Header />
       {isPending && (
-        <Loading message="Loading portfolio data..." />
+        <Loading message={t('loadingPortfolio')} />
       )}
 
       {!isPending && error && (
         <div className="rounded-xl border border-rose-200 bg-rose-50 p-6 text-rose-700">
-          {error instanceof Error ? error.message : 'Unexpected error'}
+          {error instanceof Error ? error.message : t('unexpectedError')}
         </div>
       )}
 

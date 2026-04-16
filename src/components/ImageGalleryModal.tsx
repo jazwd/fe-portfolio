@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { IoChevronBack, IoChevronForward, IoClose } from 'react-icons/io5'
 
 type ImageGalleryModalProps = {
@@ -15,6 +16,7 @@ const ImageGalleryModal = ({
   onClose,
 }: ImageGalleryModalProps) => {
   const [index, setIndex] = useState(initialIndex)
+  const { t } = useTranslation('home')
   const currentImage = images[index]
   const hasMultipleImages = images.length > 1
 
@@ -66,7 +68,7 @@ const ImageGalleryModal = ({
       <button
         type="button"
         onClick={onClose}
-        aria-label="Close gallery"
+        aria-label={t('closeGallery')}
         className="absolute top-4 right-4 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
       >
         <IoClose className="text-2xl" />
@@ -76,7 +78,7 @@ const ImageGalleryModal = ({
         <button
           type="button"
           onClick={handlePrev}
-          aria-label="Previous image"
+          aria-label={t('previousImage')}
           className="absolute left-4 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
         >
           <IoChevronBack className="text-2xl" />
@@ -104,7 +106,7 @@ const ImageGalleryModal = ({
         <button
           type="button"
           onClick={handleNext}
-          aria-label="Next image"
+          aria-label={t('nextImage')}
           className="absolute right-4 rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
         >
           <IoChevronForward className="text-2xl" />
