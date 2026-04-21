@@ -4,8 +4,15 @@ export default async function handler(req: any, res: any) {
 		return;
 	}
 
-	const awsApiUrl = process.env.AWS_API_URL;
-	const awsApiKey = process.env.AWS_API_KEY;
+	const runtimeEnv = (
+		globalThis as {
+			process?: {
+				env?: Record<string, string | undefined>;
+			};
+		}
+	).process?.env;
+	const awsApiUrl = runtimeEnv?.AWS_API_URL;
+	const awsApiKey = runtimeEnv?.AWS_API_KEY;
 
 	if (!awsApiUrl || !awsApiKey) {
 		res.status(500).json({
