@@ -12,10 +12,25 @@ Use `VITE_PORTFOLIO_SOURCE` to choose how projects are fetched:
 
 AWS variables:
 
-- `VITE_AWS_API_URL`
-- `VITE_AWS_API_KEY`
+- `VITE_AWS_API_PROXY_PATH` (default: `/api/aws/projects` for local dev)
+
+Server-side AWS variables (Vercel Project Settings -> Environment Variables):
+
+- `AWS_API_URL`
+- `AWS_API_KEY`
 
 The app normalizes both response formats to a single `PortfolioResponse` shape used by the UI.
+
+Development CORS note:
+
+- In `npm run dev`, AWS requests are proxied through Vite (`/api/aws/projects`) to avoid browser CORS errors.
+- If you change env vars, restart the dev server.
+
+Production CORS note (josezamora-portfolio.vercel.app):
+
+- The frontend calls `/api/aws/projects` on the same domain.
+- `api/aws/projects.ts` runs server-side on Vercel and forwards the request to AWS with `x-api-key`.
+- Because the browser no longer calls the AWS domain directly, CORS is avoided.
 
 Currently, two official plugins are available:
 

@@ -9,6 +9,7 @@ interface ImportMetaEnv {
 	readonly VITE_PORTFOLIO_SOURCE?: "api" | "aws" | "fallback";
 	readonly VITE_AWS_API_URL?: string;
 	readonly VITE_AWS_API_KEY?: string;
+	readonly VITE_AWS_API_PROXY_PATH?: string;
 }
 
 interface ImportMeta {
