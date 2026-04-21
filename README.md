@@ -13,7 +13,7 @@ Use `VITE_PORTFOLIO_SOURCE` to choose how projects are fetched:
 AWS variables:
 
 - `VITE_AWS_API_URL`
-- `VITE_AWS_API_KEY`
+- `VITE_AWS_API_KEY` (optional, only if endpoint requires `x-api-key`)
 
 The app normalizes both response formats to a single `PortfolioResponse` shape used by the UI.
 

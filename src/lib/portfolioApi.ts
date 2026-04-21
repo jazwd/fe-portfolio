@@ -136,10 +136,7 @@ const getAwsConfig = () => {
 		url: trimTrailingSlash(
 			getRequiredEnv("VITE_AWS_API_URL", import.meta.env.VITE_AWS_API_URL),
 		),
-		apiKey: getRequiredEnv(
-			"VITE_AWS_API_KEY",
-			import.meta.env.VITE_AWS_API_KEY,
-		),
+		apiKey: import.meta.env.VITE_AWS_API_KEY,
 	};
 };
 
@@ -292,10 +289,9 @@ const requestPortfolio = async (token: string) => {
 
 const requestAwsPortfolio = async () => {
 	const { url, apiKey } = getAwsConfig();
+	const headers = apiKey ? { "x-api-key": apiKey } : undefined;
 	const response = await fetch(url, {
-		headers: {
-			"x-api-key": apiKey,
-		},
+		headers,
 	});
 
 	return response;
