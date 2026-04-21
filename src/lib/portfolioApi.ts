@@ -1,6 +1,8 @@
 const TOKEN_STORAGE_KEY = "portfolio_api_bearer_token";
 const TOKEN_EXPIRY_STORAGE_KEY = "portfolio_api_bearer_token_expiry";
 
+type PortfolioSource = "api" | "aws" | "fallback";
+
 export type PortfolioProjectImage = {
 	title: string;
 	path: string;
@@ -44,6 +46,18 @@ type RawPortfolioResponse = {
 	message: string;
 	count: number;
 	data: RawPortfolioProject[];
+};
+
+type AwsPortfolioResponseEnvelope = {
+	statusCode?: number;
+	body?: string | AwsPortfolioResponseBody;
+	message?: string;
+	data?: RawPortfolioProject[];
+};
+
+type AwsPortfolioResponseBody = {
+	message?: string;
+	data?: RawPortfolioProject[];
 };
 
 type TokenResponse = {
@@ -93,6 +107,38 @@ const getApiConfig = () => {
 				"VITE_API_TOKEN_TTL_MS",
 				import.meta.env.VITE_API_TOKEN_TTL_MS,
 			),
+		),
+	};
+};
+
+const getPortfolioSource = (): PortfolioSource => {
+	const configuredSource = import.meta.env.VITE_PORTFOLIO_SOURCE;
+
+	if (!configuredSource) {
+		return "api";
+	}
+
+	if (
+		configuredSource !== "api" &&
+		configuredSource !== "aws" &&
+		configuredSource !== "fallback"
+	) {
+		throw new Error(
+			"Invalid VITE_PORTFOLIO_SOURCE value. Allowed values: api, aws, fallback.",
+		);
+	}
+
+	return configuredSource;
+};
+
+const getAwsConfig = () => {
+	return {
+		url: trimTrailingSlash(
+			getRequiredEnv("VITE_AWS_API_URL", import.meta.env.VITE_AWS_API_URL),
+		),
+		apiKey: getRequiredEnv(
+			"VITE_AWS_API_KEY",
+			import.meta.env.VITE_AWS_API_KEY,
 		),
 	};
 };
@@ -160,6 +206,43 @@ const mapPortfolioResponse = (
 	};
 };
 
+const toRawPortfolioResponse = (
+	payload: AwsPortfolioResponseBody,
+): RawPortfolioResponse => {
+	if (!Array.isArray(payload.data)) {
+		throw new Error(
+			"AWS portfolio response does not contain a valid data array",
+		);
+	}
+
+	return {
+		message: payload.message ?? "Projects fetched successfully",
+		count: payload.data.length,
+		data: payload.data,
+	};
+};
+
+const normalizeAwsResponse = (payload: unknown): RawPortfolioResponse => {
+	if (!payload || typeof payload !== "object") {
+		throw new Error("AWS portfolio response has an invalid format");
+	}
+
+	const envelope = payload as AwsPortfolioResponseEnvelope;
+	const bodyCandidate =
+		typeof envelope.body === "string"
+			? (JSON.parse(envelope.body) as AwsPortfolioResponseBody)
+			: envelope.body;
+
+	if (bodyCandidate && typeof bodyCandidate === "object") {
+		return toRawPortfolioResponse(bodyCandidate);
+	}
+
+	return toRawPortfolioResponse({
+		message: envelope.message,
+		data: envelope.data,
+	});
+};
+
 const loginAndGetToken = async () => {
 	const { baseUrl, username, password, tokenTtlMs } = getApiConfig();
 
@@ -207,7 +290,19 @@ const requestPortfolio = async (token: string) => {
 	return response;
 };
 
-export const fetchPortfolioInformation = async () => {
+const requestAwsPortfolio = async () => {
+	const { url, apiKey } = getAwsConfig();
+
+	const response = await fetch(url, {
+		headers: {
+			"x-api-key": apiKey,
+		},
+	});
+
+	return response;
+};
+
+const fetchPortfolioFromApi = async () => {
 	let token = await getValidToken();
 	let response = await requestPortfolio(token);
 
@@ -223,4 +318,35 @@ export const fetchPortfolioInformation = async () => {
 
 	const payload = (await response.json()) as RawPortfolioResponse;
 	return mapPortfolioResponse(payload);
+};
+
+const fetchPortfolioFromAws = async () => {
+	const response = await requestAwsPortfolio();
+
+	if (!response.ok) {
+		throw new Error(
+			`AWS portfolio request failed with status ${response.status}`,
+		);
+	}
+
+	const payload = (await response.json()) as unknown;
+	return mapPortfolioResponse(normalizeAwsResponse(payload));
+};
+
+export const fetchPortfolioInformation = async () => {
+	const source = getPortfolioSource();
+
+	if (source === "aws") {
+		return fetchPortfolioFromAws();
+	}
+
+	if (source === "fallback" || source === "api") {
+		try {
+			return await fetchPortfolioFromApi();
+		} catch {
+			return fetchPortfolioFromAws();
+		}
+	}
+
+	return fetchPortfolioFromApi();
 };
