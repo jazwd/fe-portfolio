@@ -133,7 +133,13 @@ const getPortfolioSource = (): PortfolioSource => {
 
 const getAwsConfig = () => {
 	return {
-		proxyPath: import.meta.env.VITE_AWS_API_PROXY_PATH ?? "/api/aws/projects",
+		url: trimTrailingSlash(
+			getRequiredEnv("VITE_AWS_API_URL", import.meta.env.VITE_AWS_API_URL),
+		),
+		apiKey: getRequiredEnv(
+			"VITE_AWS_API_KEY",
+			import.meta.env.VITE_AWS_API_KEY,
+		),
 	};
 };
 
@@ -285,8 +291,12 @@ const requestPortfolio = async (token: string) => {
 };
 
 const requestAwsPortfolio = async () => {
-	const { proxyPath } = getAwsConfig();
-	const response = await fetch(proxyPath);
+	const { url, apiKey } = getAwsConfig();
+	const response = await fetch(url, {
+		headers: {
+			"x-api-key": apiKey,
+		},
+	});
 
 	return response;
 };
